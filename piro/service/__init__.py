@@ -1,7 +1,15 @@
 import sys
 
+from thrift import Thrift
+from thrift.transport import TTransport
+from thrift.transport import TSocket
+from thrift.protocol.TBinaryProtocol import TBinaryProtocolAccelerated
+
 from piro.service import monit
 import piro.util as util
+
+from piro.thrift.cassandra import Cassandra
+from piro.thrift.cassandra.ttypes import *
 
 def start(service, hosts, **kwargs):
     try:
