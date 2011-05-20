@@ -36,6 +36,21 @@ def start(service, host, wait=False):
             sleep(.1)
         return ('success', 'service %s is running' % service)
 
+def restart(service, host, wait=False):
+    data = urlencode({'action': 'restart'})
+    req = urllib2.Request('http://%s:2812/%s' % (host, service), data=data,
+                          headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
+    try:
+        res = urllib2.urlopen(req, timeout=1)
+    except urllib2.URLError, exc:
+        return ('error', exc.reason)
+    if not wait:
+        return ('success', 'restart signal sent to service %s' % service)
+    else:
+        while status(service, host)[0] != 'running':
+            sleep(.1)
+        return ('success', 'service %s is running' % service)
+
 def status(service, host):
     req = urllib2.Request('http://%s:2812/_status?format=xml' % host,
                           headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
