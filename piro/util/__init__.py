@@ -23,11 +23,19 @@ def hostname(host):
 def disable_az(az):
     pass
 
-def raise_cassandra_scores(hosts):
+def set_cassandra_score(host):
     pass
+
+def clear_cassandra_score(host):
+    pass
+
 def print_status(statuses):
     if type(statuses) is tuple:
         print '%s\t%s\t\t%s' % (host, status, message)
     else:
         for (host, (status, message)) in statuses:
             print '%s\t%s\t\t%s' % (host, status, message)
+
+def disable_puppet(host):
+    print 'disabling puppet...'
+    print '\tnot implemented yet'

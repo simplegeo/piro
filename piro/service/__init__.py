@@ -67,25 +67,72 @@ def generic_status(service, hosts, **kwargs):
     print_status(statuses)
 
 ### Put non-generic services here. ###
+def start_cassandra(hosts, timeout=120, **kwargs):
+    for host in hosts:
+        util.clear_cassandra_score(host)
+        print_status((host, monit.start('cassandra'
+                                        util.hostname(host))))
+        print 'waiting for thrift response from %s' % host
+        response = wait_for_cassandra_response(host, timeout)
+        print_status((host, response))
 
-def start_cassandra(hosts, prod=False):
-    print "Not implemented yet."
+def stop_cassandra(hosts, prod=False, **kwargs):
+    azs = util.hosts_by_az(hosts).keys()
+    if prod and len(azs) > 1:
+        print 'cannot stop production cassandra in multiple AZs!'
+        return
+    elif prod:
+        util.disable_az(azs[0])
+    for host in hosts:
+        util.set_cassandra_score(host)
+        util.disable_puppet(util.hostname(host)):
+        print_status((host, monit.stop('cassandra'
+                                       util.hostname(host),
+                                       wait=True)))
 
-def stop_cassandra(hosts, prod=False):
-    print "Not implemented yet."
+def wait_for_cassandra_response(host, timeout):
+    start = int(time.time())
+    cassandra_alive = (False, 'no response from cassandra')
+    host = util.hostname(host)
+    socket = TSocket.TSocket(host, 9160)
+    transport = TTransport.TFramedTransport(socket)
+    protocol = TBinaryProtocolAccelerated(transport)
+    client = Cassandra.Client(protocol)
+    while (not cassandra_alive):
+        try:
+            transport.open()
+            cassandra_alive = client.get_ring_state()
+            break
+        except Thrift.TException:
+            continue
+        finally:
+            transport.close()
+        if (int(time.time()) > (start + timeout)):
+            cassandra_alive = ('timeout',
+                               'no response from cassandra in %ss' % timeout)
+            break
+    return cassandra_alive
 
-# This is obviously incomplete. Do not use.
-def restart_cassandra(hosts, prod=False):
+def restart_cassandra(hosts, prod=False, timeout=120, **kwargs):
     hosts = util.hosts_by_az(hosts)
     for az in hosts.keys():
         if prod:
             util.disable_az(az)
-            util.raise_cassandra_scores(hosts[az])
         for host in hosts[az]:
-            monit.stop('cassandra', host, wait=True)
+            util.set_cassandra_score(host)
+            util.disable_puppet(util.hostname(host)):
+            print_status((host, monit.stop('cassandra',
+                                           util.hostname(host),
+                                           wait=True)))
+            print_status((host, monit.start('cassandra',
+                                            util.hostname(host))))
+            print 'waiting for thrift response from %s' % host
+            response = wait_for_cassandra_response(host, timeout)
+            print_status((host, response))
 
-def status_cassandra(hosts, **kwargs):
+def status_cassandra(hosts, timeout=120, **kwargs):
     statuses = [(host, monit.status('simplegeo-cassandra', util.hostname(host)))
                 for host in hosts]
-    for (host, (status, message)) in statuses:
-        print '%s\t%s\t%s' % (host, status, message)
+    statuses += [(host, ('ring_state', wait_for_cassandra_response(host, timeout)))
+                 for host in hosts]
+    print_status(sorted(statuses))
