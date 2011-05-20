@@ -23,8 +23,7 @@ def generic_start(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.start(service, util.hostname(host))))
-    for (host, (status, message)) in statuses:
-        print '%s\t%s\t\t%s' % (host, status, message)
+    print_status(statuses)
 
 def stop(service, hosts, **kwargs):
     try:
@@ -38,8 +37,7 @@ def generic_stop(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.stop(service, util.hostname(host))))
-    for (host, (status, message)) in statuses:
-        print '%s\t%s\t\t%s' % (host, status, message)
+    print_status(statuses)
 
 def restart(service, hosts, **kwargs):
     try:
@@ -53,8 +51,7 @@ def generic_restart(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.restart(service, util.hostname(host))))
-    for (host, (status, message)) in statuses:
-        print '%s\t%s\t\t%s' % (host, status, message)
+    print_status(statuses)
 
 def status(service, hosts, **kwargs):
     try:
@@ -67,8 +64,7 @@ def status(service, hosts, **kwargs):
 def generic_status(service, hosts, **kwargs):
     statuses = [(host, monit.status(service, util.hostname(host)))
                 for host in hosts]
-    for (host, (status, message)) in statuses:
-        print '%s\t%s\t\t%s' % (host, status, message)
+    print_status(statuses)
 
 ### Put non-generic services here. ###
 
