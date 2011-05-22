@@ -23,7 +23,7 @@ def generic_start(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.start(service, util.hostname(host))))
-    print_status(statuses)
+    util.print_status(statuses)
 
 def stop(service, hosts, **kwargs):
     try:
@@ -37,7 +37,7 @@ def generic_stop(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.stop(service, util.hostname(host))))
-    print_status(statuses)
+    util.print_status(statuses)
 
 def restart(service, hosts, **kwargs):
     try:
@@ -51,7 +51,7 @@ def generic_restart(service, hosts, **kwargs):
     statuses = []
     for host in hosts:
         statuses.append((host, monit.restart(service, util.hostname(host))))
-    print_status(statuses)
+    util.print_status(statuses)
 
 def status(service, hosts, **kwargs):
     try:
@@ -64,17 +64,17 @@ def status(service, hosts, **kwargs):
 def generic_status(service, hosts, **kwargs):
     statuses = [(host, monit.status(service, util.hostname(host)))
                 for host in hosts]
-    print_status(statuses)
+    util.print_status(statuses)
 
 ### Put non-generic services here. ###
 def start_cassandra(hosts, timeout=120, **kwargs):
     for host in hosts:
         util.clear_cassandra_score(host)
-        print_status((host, monit.start('cassandra'
+        util.print_status((host, monit.start('cassandra',
                                         util.hostname(host))))
         print 'waiting for thrift response from %s' % host
         response = wait_for_cassandra_response(host, timeout)
-        print_status((host, response))
+        util.print_status((host, response))
 
 def stop_cassandra(hosts, prod=False, **kwargs):
     azs = util.hosts_by_az(hosts).keys()
@@ -85,8 +85,8 @@ def stop_cassandra(hosts, prod=False, **kwargs):
         util.disable_az(azs[0])
     for host in hosts:
         util.set_cassandra_score(host)
-        util.disable_puppet(util.hostname(host)):
-        print_status((host, monit.stop('cassandra'
+        util.disable_puppet(util.hostname(host))
+        util.print_status((host, monit.stop('cassandra',
                                        util.hostname(host),
                                        wait=True)))
 
@@ -120,19 +120,19 @@ def restart_cassandra(hosts, prod=False, timeout=120, **kwargs):
             util.disable_az(az)
         for host in hosts[az]:
             util.set_cassandra_score(host)
-            util.disable_puppet(util.hostname(host)):
-            print_status((host, monit.stop('cassandra',
+            util.disable_puppet(util.hostname(host))
+            util.print_status((host, monit.stop('cassandra',
                                            util.hostname(host),
                                            wait=True)))
-            print_status((host, monit.start('cassandra',
+            util.print_status((host, monit.start('cassandra',
                                             util.hostname(host))))
             print 'waiting for thrift response from %s' % host
             response = wait_for_cassandra_response(host, timeout)
-            print_status((host, response))
+            util.print_status((host, response))
 
 def status_cassandra(hosts, timeout=120, **kwargs):
     statuses = [(host, monit.status('simplegeo-cassandra', util.hostname(host)))
                 for host in hosts]
     statuses += [(host, ('ring_state', wait_for_cassandra_response(host, timeout)))
                  for host in hosts]
-    print_status(sorted(statuses))
+    util.print_status(sorted(statuses))
