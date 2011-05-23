@@ -26,4 +26,4 @@ def main():
     args.prod = 'production' in args.pool
     hosts = get_hosts(args.pool)
     return getattr(sys.modules['piro.service'],
-                   args.action)(args.service, hosts, prod=args.prod)
+                   args.action)(hosts, service=args.service, prod=args.prod)

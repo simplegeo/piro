@@ -1,4 +1,5 @@
 import sys
+import time
 
 from thrift import Thrift
 from thrift.transport import TTransport
@@ -11,60 +12,56 @@ import piro.util as util
 from piro.thrift.cassandra import Cassandra
 from piro.thrift.cassandra.ttypes import *
 
-def start(service, hosts, **kwargs):
+# I need to make the generic call signature match the specific call
+# signature. Otherwise I'm going to unintentionally catch
+# AttributeErrors lower down the call stack.
+def start(hosts, service=None, **kwargs):
     try:
-        service_fn = service.lower().replace('-', '_')
-        return getattr(sys.modules['piro.service'],
-                       'start_%s' % service_fn)(hosts, **kwargs)
+        service_fn = getattr(sys.modules['piro.service'],
+                             'start_%s' % service.lower().replace('-', '_'))
     except AttributeError:
-        return generic_start(service, hosts, **kwargs)
+        service_fn = generic_start
+    return service_fn(hosts, service=service, **kwargs)
 
-def generic_start(service, hosts, **kwargs):
-    statuses = []
+def generic_start(hosts, service=None, **kwargs):
     for host in hosts:
-        statuses.append((host, monit.start(service, util.hostname(host))))
-    util.print_status(statuses)
+        util.print_status((host, monit.start(service, util.hostname(host))))
 
-def stop(service, hosts, **kwargs):
+def stop(hosts, service=None, **kwargs):
     try:
-        service_fn = service.lower().replace('-', '_')
-        return getattr(sys.modules['piro.service'],
-                       'stop_%s' % service_fn)(hosts, **kwargs)
+        service_fn = getattr(sys.modules['piro.service'],
+                             'stop_%s' % service.lower().replace('-', '_'))
     except AttributeError:
-        return generic_stop(service, hosts, **kwargs)
+        service_fn = generic_stop
+    return service_fn(hosts, service=service, **kwargs)
 
-def generic_stop(service, hosts, **kwargs):
-    statuses = []
+def generic_stop(hosts, service=None, **kwargs):
     for host in hosts:
-        statuses.append((host, monit.stop(service, util.hostname(host))))
-    util.print_status(statuses)
+        util.print_status((host, monit.stop(service, util.hostname(host))))
 
-def restart(service, hosts, **kwargs):
+def restart(hosts, service=None, **kwargs):
     try:
-        service_fn = service.lower().replace('-', '_')
-        return getattr(sys.modules['piro.service'],
-                       'restart_%s' % service_fn)(hosts, **kwargs)
+        service_fn = getattr(sys.modules['piro.service'],
+                             'restart_%s' % service.lower().replace('-', '_'))
     except AttributeError:
-        return generic_restart(service, hosts, **kwargs)
+        service_fn = generic_restart
+    return service_fn(hosts, service=service, **kwargs)
 
-def generic_restart(service, hosts, **kwargs):
-    statuses = []
+def generic_restart(hosts, service=None, **kwargs):
     for host in hosts:
-        statuses.append((host, monit.restart(service, util.hostname(host))))
-    util.print_status(statuses)
+        util.print_status((host, monit.restart(service, util.hostname(host))))
 
-def status(service, hosts, **kwargs):
+def status(hosts, service=None, **kwargs):
     try:
-        service_fn = service.lower().replace('-', '_')
-        return getattr(sys.modules['piro.service'],
-                       'status_%s' % service_fn)(hosts, **kwargs)
+        service_fn = getattr(sys.modules['piro.service'],
+                             'status_%s' % service.lower().replace('-', '_'))
     except AttributeError:
-        return generic_status(service, hosts, **kwargs)
+        service_fn = generic_status
+    return service_fn(hosts, service=service, **kwargs)
 
-def generic_status(service, hosts, **kwargs):
-    statuses = [(host, monit.status(service, util.hostname(host)))
-                for host in hosts]
-    util.print_status(statuses)
+def generic_status(hosts, service=None, **kwargs):
+    for host in hosts:
+        util.print_status((host, monit.status(service, util.hostname(host))))
 
 ### Put non-generic services here. ###
 def start_cassandra(hosts, timeout=120, **kwargs):
@@ -75,6 +72,8 @@ def start_cassandra(hosts, timeout=120, **kwargs):
         print 'waiting for thrift response from %s' % host
         response = wait_for_cassandra_response(host, timeout)
         util.print_status((host, response))
+
+start_simplegeo_cassandra = start_cassandra
 
 def stop_cassandra(hosts, prod=False, **kwargs):
     azs = util.hosts_by_az(hosts).keys()
@@ -90,6 +89,8 @@ def stop_cassandra(hosts, prod=False, **kwargs):
                                        util.hostname(host),
                                        wait=True)))
 
+stop_simplegeo_cassandra = stop_cassandra
+
 def wait_for_cassandra_response(host, timeout):
     start = int(time.time())
     cassandra_alive = (False, 'no response from cassandra')
@@ -98,7 +99,7 @@ def wait_for_cassandra_response(host, timeout):
     transport = TTransport.TFramedTransport(socket)
     protocol = TBinaryProtocolAccelerated(transport)
     client = Cassandra.Client(protocol)
-    while (not cassandra_alive):
+    while (not cassandra_alive[0]):
         try:
             transport.open()
             cassandra_alive = client.get_ring_state()
@@ -111,6 +112,7 @@ def wait_for_cassandra_response(host, timeout):
             cassandra_alive = ('timeout',
                                'no response from cassandra in %ss' % timeout)
             break
+    print cassandra_alive
     return cassandra_alive
 
 def restart_cassandra(hosts, prod=False, timeout=120, **kwargs):
@@ -130,9 +132,13 @@ def restart_cassandra(hosts, prod=False, timeout=120, **kwargs):
             response = wait_for_cassandra_response(host, timeout)
             util.print_status((host, response))
 
+restart_simplegeo_cassandra = restart_cassandra
+
 def status_cassandra(hosts, timeout=120, **kwargs):
     statuses = [(host, monit.status('simplegeo-cassandra', util.hostname(host)))
                 for host in hosts]
     statuses += [(host, ('ring_state', wait_for_cassandra_response(host, timeout)))
                  for host in hosts]
     util.print_status(sorted(statuses))
+
+status_simplegeo_cassandra = status_cassandra
