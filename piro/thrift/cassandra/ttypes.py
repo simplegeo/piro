@@ -1443,6 +1443,122 @@ class TokenRange:
   def __ne__(self, other):
     return not (self == other)
 
+class RingMember:
+  """
+  a structure to represent the opposite view of the cluster node->token; the primary purpose is to expose internal ring state to clients
+  
+  score is defaulted to 0 in case DES is not enabled
+  
+  Attributes:
+   - host
+   - token
+   - up
+   - replicas
+   - score
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'host', None, None, ), # 1
+    (2, TType.STRING, 'token', None, None, ), # 2
+    (3, TType.BOOL, 'up', None, None, ), # 3
+    (4, TType.LIST, 'replicas', (TType.STRING,None), None, ), # 4
+    (5, TType.DOUBLE, 'score', None, 0, ), # 5
+  )
+
+  def __init__(self, host=None, token=None, up=None, replicas=None, score=thrift_spec[5][4],):
+    self.host = host
+    self.token = token
+    self.up = up
+    self.replicas = replicas
+    self.score = score
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.host = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.token = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.BOOL:
+          self.up = iprot.readBool();
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.LIST:
+          self.replicas = []
+          (_etype31, _size28) = iprot.readListBegin()
+          for _i32 in xrange(_size28):
+            _elem33 = iprot.readString();
+            self.replicas.append(_elem33)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.DOUBLE:
+          self.score = iprot.readDouble();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('RingMember')
+    if self.host != None:
+      oprot.writeFieldBegin('host', TType.STRING, 1)
+      oprot.writeString(self.host)
+      oprot.writeFieldEnd()
+    if self.token != None:
+      oprot.writeFieldBegin('token', TType.STRING, 2)
+      oprot.writeString(self.token)
+      oprot.writeFieldEnd()
+    if self.up != None:
+      oprot.writeFieldBegin('up', TType.BOOL, 3)
+      oprot.writeBool(self.up)
+      oprot.writeFieldEnd()
+    if self.replicas != None:
+      oprot.writeFieldBegin('replicas', TType.LIST, 4)
+      oprot.writeListBegin(TType.STRING, len(self.replicas))
+      for iter34 in self.replicas:
+        oprot.writeString(iter34)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.score != None:
+      oprot.writeFieldBegin('score', TType.DOUBLE, 5)
+      oprot.writeDouble(self.score)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class AuthenticationRequest:
   """
   Authentication requests can contain any data, dependent on the AuthenticationBackend used
@@ -1471,11 +1587,11 @@ class AuthenticationRequest:
       if fid == 1:
         if ftype == TType.MAP:
           self.credentials = {}
-          (_ktype29, _vtype30, _size28 ) = iprot.readMapBegin() 
-          for _i32 in xrange(_size28):
-            _key33 = iprot.readString();
-            _val34 = iprot.readString();
-            self.credentials[_key33] = _val34
+          (_ktype36, _vtype37, _size35 ) = iprot.readMapBegin() 
+          for _i39 in xrange(_size35):
+            _key40 = iprot.readString();
+            _val41 = iprot.readString();
+            self.credentials[_key40] = _val41
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
@@ -1492,9 +1608,9 @@ class AuthenticationRequest:
     if self.credentials != None:
       oprot.writeFieldBegin('credentials', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.credentials))
-      for kiter35,viter36 in self.credentials.items():
-        oprot.writeString(kiter35)
-        oprot.writeString(viter36)
+      for kiter42,viter43 in self.credentials.items():
+        oprot.writeString(kiter42)
+        oprot.writeString(viter43)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()

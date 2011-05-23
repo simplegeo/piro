@@ -49,6 +49,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '   get_thread_pool_stats()'
   print '   get_table_stats(string table_name)'
   print '   describe_splits(string start_token, string end_token, i32 keys_per_split)'
+  print '   get_ring_state(string keyspace)'
   print ''
   sys.exit(0)
 
@@ -264,5 +265,11 @@ elif cmd == 'describe_splits':
     print 'describe_splits requires 3 args'
     sys.exit(1)
   pp.pprint(client.describe_splits(args[0],args[1],eval(args[2]),))
+
+elif cmd == 'get_ring_state':
+  if len(args) != 1:
+    print 'get_ring_state requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.get_ring_state(args[0],))
 
 transport.close()
