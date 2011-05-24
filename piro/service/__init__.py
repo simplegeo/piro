@@ -125,6 +125,12 @@ def restart_simplegeo_cassandra(hosts, args=None, **kwargs):
             response = wait_for_cassandra_response(host, args.keyspace,
                                                    args.timeout)
             util.print_status(('', ('keyspaces', response)))
+            if 'system' not in response:
+                util.print_status(('', ('ERROR', 'Could not verify startup on %s' % host)))
+                if args.prod:
+                    print
+                    print 'Cowardly refusing to continue production restart'
+                    break
 
 def status_simplegeo_cassandra(hosts, args=None, **kwargs):
     for host in hosts:
