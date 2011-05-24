@@ -3,6 +3,7 @@
 import sys
 import time
 
+from cassandra import Cassandra
 from thrift import Thrift
 from thrift.transport import TTransport
 from thrift.transport import TSocket
@@ -10,10 +11,6 @@ from thrift.protocol.TBinaryProtocol import TBinaryProtocolAccelerated
 
 from piro.service import monit
 import piro.util as util
-
-
-from cassandra import Cassandra
-from cassandra.ttypes import *
 
 def start(hosts, service=None, **kwargs):
     """
