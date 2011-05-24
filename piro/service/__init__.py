@@ -88,6 +88,10 @@ def wait_for_cassandra_response(host, keyspace, timeout):
     cassandra_alive = False
     host = util.hostname(host)
     while (not cassandra_alive):
+        if (int(time.time()) > (start + timeout)):
+            cassandra_alive = 'timeout'
+            transport.close()
+            continue
         try:
             socket = TSocket.TSocket(host, 9160)
             transport = TTransport.TFramedTransport(socket)
@@ -97,12 +101,6 @@ def wait_for_cassandra_response(host, keyspace, timeout):
         except Thrift.TException:
             transport.close()
             continue
-
-        if (int(time.time()) > (start + timeout)):
-            cassandra_alive = 'timeout'
-            transport.close()
-            continue
-
         try:
             cassandra_alive = client.describe_keyspaces()
         except Thrift.TException, e:
