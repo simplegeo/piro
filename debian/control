@@ -7,6 +7,7 @@ Build-Depends: cdbs,
  python,
  python-support,
  python-setuptools,
+ python-cassandra,
  python-thrift
 Standards-Version: 3.8.4
 Homepage: https://github.com/simplegeo/piro
@@ -15,7 +16,9 @@ Package: piro
 Architecture: all
 Depends: ${shlibs:Depends},
  ${misc:Depends},
- python
+ python,
+ python-cassandra,
+ python-thrift
 Description: Intelligently manage services.
  A command-line utility to help you intelligently start, stop,
  restart, and check the status of services.
