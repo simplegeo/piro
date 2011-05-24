@@ -1,3 +1,12 @@
+piro (0.1.0) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Update version.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 24 May 2011 22:18:02 +0000
+
 piro (0.1.0) unstable; urgency=low
 
   * Initial Release.
