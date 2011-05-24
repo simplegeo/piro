@@ -1,3 +1,12 @@
+piro (0.1.6) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Don't bundle cassandra thrift bindings. Use a package.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 24 May 2011 22:40:42 +0000
+
 piro (0.1.0) lucid; urgency=low
 
   [ Paul Lathrop ]
