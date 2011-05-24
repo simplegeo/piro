@@ -40,7 +40,8 @@ def _print_status(status):
         host = host.name
         host = host.ljust(len(host) + 5)
     status = status.ljust(15)
-    if type(message) is not str and isinstance(message, (Sequence, Set)):
+    if not isinstance(message, (str, unicode)) and isinstance(message,
+                                                              (Sequence, Set)):
         message = ', '.join(message)
     print '%s%s%s' % (host, status, message)
 
