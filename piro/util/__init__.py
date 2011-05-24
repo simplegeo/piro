@@ -13,12 +13,10 @@ def get_contents(pool):
     contains."""
     return set(CLUSTO.get_by_name(pool).contents())
 
-
 def get_hosts(pools):
     """Given an iterable containing clusto pools, return the set of
     entities contained by all of those pools."""
     return set.intersection(*map(get_contents, pools))
-
 
 def hosts_by_az(hosts):
     """
