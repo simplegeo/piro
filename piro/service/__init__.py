@@ -64,81 +64,78 @@ def generic_status(hosts, service=None, **kwargs):
         util.print_status((host, monit.status(service, util.hostname(host))))
 
 ### Put non-generic services here. ###
-def start_cassandra(hosts, timeout=120, **kwargs):
+def start_simplegeo_cassandra(hosts, args=None, **kwargs):
     for host in hosts:
         util.clear_cassandra_score(host)
-        util.print_status((host, monit.start('cassandra',
-                                        util.hostname(host))))
-        print 'waiting for thrift response from %s' % host
-        response = wait_for_cassandra_response(host, timeout)
-        util.print_status((host, response))
+        util.print_status((host, monit.start('simplegeo-cassandra',
+                                             util.hostname(host))))
+        response = wait_for_cassandra_response(host, args.keyspace, args.timeout)
+        util.print_status(('', ('keyspaces', response)))
 
-start_simplegeo_cassandra = start_cassandra
-
-def stop_cassandra(hosts, prod=False, **kwargs):
+def stop_simplegeo_cassandra(hosts, args=None, **kwargs):
     azs = util.hosts_by_az(hosts).keys()
-    if prod and len(azs) > 1:
+    if args.prod and len(azs) > 1:
         print 'cannot stop production cassandra in multiple AZs!'
         return
-    elif prod:
+    elif args.prod:
         util.disable_az(azs[0])
     for host in hosts:
         util.set_cassandra_score(host)
         util.disable_puppet(util.hostname(host))
-        util.print_status((host, monit.stop('cassandra',
+        util.print_status((host, monit.stop('simplegeo-cassandra',
                                        util.hostname(host),
                                        wait=True)))
 
-stop_simplegeo_cassandra = stop_cassandra
-
-def wait_for_cassandra_response(host, timeout):
+def wait_for_cassandra_response(host, keyspace, timeout):
     start = int(time.time())
-    cassandra_alive = (False, 'no response from cassandra')
+    cassandra_alive = False
     host = util.hostname(host)
-    socket = TSocket.TSocket(host, 9160)
-    transport = TTransport.TFramedTransport(socket)
-    protocol = TBinaryProtocolAccelerated(transport)
-    client = Cassandra.Client(protocol)
-    while (not cassandra_alive[0]):
+    while (not cassandra_alive):
         try:
+            socket = TSocket.TSocket(host, 9160)
+            transport = TTransport.TFramedTransport(socket)
+            protocol = TBinaryProtocolAccelerated(transport)
+            client = Cassandra.Client(protocol)
             transport.open()
-            cassandra_alive = client.get_ring_state()
-            break
         except Thrift.TException:
-            continue
-        finally:
             transport.close()
+            continue
+
         if (int(time.time()) > (start + timeout)):
-            cassandra_alive = ('timeout',
-                               'no response from cassandra in %ss' % timeout)
-            break
-    print cassandra_alive
+            cassandra_alive = 'timeout'
+            transport.close()
+            continue
+
+        try:
+            cassandra_alive = client.describe_keyspaces()
+        except Thrift.TException, e:
+            cassandra_alive = e
+            transport.close()
+            continue
     return cassandra_alive
 
-def restart_cassandra(hosts, prod=False, timeout=120, **kwargs):
+def restart_simplegeo_cassandra(hosts, args=None, **kwargs):
     hosts = util.hosts_by_az(hosts)
     for az in hosts.keys():
-        if prod:
+        if args.prod:
             util.disable_az(az)
         for host in hosts[az]:
             util.set_cassandra_score(host)
             util.disable_puppet(util.hostname(host))
-            util.print_status((host, monit.stop('cassandra',
+            util.print_status((host, monit.stop('simplegeo-cassandra',
                                            util.hostname(host),
                                            wait=True)))
-            util.print_status((host, monit.start('cassandra',
+            util.print_status((host, monit.start('simplegeo-cassandra',
                                             util.hostname(host))))
-            print 'waiting for thrift response from %s' % host
-            response = wait_for_cassandra_response(host, timeout)
-            util.print_status((host, response))
+            response = wait_for_cassandra_response(host, args.keyspace,
+                                                   args.timeout)
+            util.print_status(('', ('keyspaces', response)))
 
-restart_simplegeo_cassandra = restart_cassandra
-
-def status_cassandra(hosts, timeout=120, **kwargs):
-    statuses = [(host, monit.status('simplegeo-cassandra', util.hostname(host)))
-                for host in hosts]
-    statuses += [(host, ('ring_state', wait_for_cassandra_response(host, timeout)))
-                 for host in hosts]
-    util.print_status(sorted(statuses))
-
-status_simplegeo_cassandra = status_cassandra
+def status_simplegeo_cassandra(hosts, args=None, **kwargs):
+    for host in hosts:
+        util.print_status((host, monit.status('simplegeo-cassandra',
+                                              util.hostname(host))))
+        util.print_status(('', ('keyspaces',
+                                (wait_for_cassandra_response(host,
+                                                             args.keyspace,
+                                                             args.timeout)))))

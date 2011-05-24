@@ -1,3 +1,6 @@
+from collections import Sequence, Set
+import sys
+
 import piro.clustohttp as clusto
 
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
@@ -29,13 +32,27 @@ def set_cassandra_score(host):
 def clear_cassandra_score(host):
     pass
 
+def _print_status(status):
+    (host, (status, message)) = status
+    if type(host) is str:
+        host = host.rjust(len(host) + 15)
+    else:
+        host = host.name
+        host = host.ljust(len(host) + 5)
+    status = status.ljust(15)
+    if type(message) is not str and isinstance(message, (Sequence, Set)):
+        message = ', '.join(message)
+    print '%s%s%s' % (host, status, message)
+
 def print_status(statuses):
     if type(statuses) is tuple:
-        print '%s\t%s\t\t%s' % (host, status, message)
+        _print_status(statuses)
     else:
-        for (host, (status, message)) in statuses:
-            print '%s\t%s\t\t%s' % (host, status, message)
+        for status in statuses:
+            _print_status(status)
 
 def disable_puppet(host):
-    print 'disabling puppet...'
-    print '\tnot implemented yet'
+    # sys.stderr.write('disabling puppet...')
+    # sys.stderr.write('not implemented yet\n')
+    # sys.stderr.flush()
+    pass

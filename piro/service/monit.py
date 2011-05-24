@@ -10,40 +10,41 @@ def stop(service, host, wait=False):
     data = urlencode({'action': 'stop'})
     req = urllib2.Request('http://%s:2812/%s' % (host, service), data=data,
                           headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
-    try:
-        res = urllib2.urlopen(req, timeout=1)
-    except urllib2.URLError, exc:
-        return ('error', exc.reason)
+    urllib2.urlopen(req, timeout=1)
     if not wait:
         return ('success', 'stop signal sent to service %s' % service)
     else:
-        while status(service, host)[0] != 'stopped':
+        svc_status = None
+        while svc_status != 'stopped':
             sleep(.1)
+            try:
+                svc_status = status(service, host)[0]
+            except Exception, e:
+                pass
         return ('success', 'service %s is stopped' % service)
 
 def start(service, host, wait=False):
     data = urlencode({'action': 'start'})
     req = urllib2.Request('http://%s:2812/%s' % (host, service), data=data,
                           headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
-    try:
-        res = urllib2.urlopen(req, timeout=1)
-    except urllib2.URLError, exc:
-        return ('error', exc.reason)
+    urllib2.urlopen(req, timeout=1)
     if not wait:
         return ('success', 'start signal sent to service %s' % service)
     else:
-        while status(service, host)[0] != 'running':
+        svc_status = None
+        while svc_status != 'running':
             sleep(.1)
+            try:
+                svc_status = status(service, host)[0]
+            except Exception, e:
+                pass
         return ('success', 'service %s is running' % service)
 
 def restart(service, host, wait=False):
     data = urlencode({'action': 'restart'})
     req = urllib2.Request('http://%s:2812/%s' % (host, service), data=data,
                           headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
-    try:
-        res = urllib2.urlopen(req, timeout=1)
-    except urllib2.URLError, exc:
-        return ('error', exc.reason)
+    urllib2.urlopen(req, timeout=1)
     if not wait:
         return ('success', 'restart signal sent to service %s' % service)
     else:
@@ -54,10 +55,7 @@ def restart(service, host, wait=False):
 def status(service, host):
     req = urllib2.Request('http://%s:2812/_status?format=xml' % host,
                           headers={'Authorization': 'Basic YWRtaW46bW9uaXQ='})
-    try:
-        res = urllib2.urlopen(req, timeout=1)
-    except urllib2.URLError, exc:
-        return ('error', exc.reason)
+    res = urllib2.urlopen(req, timeout=1)
     data = res.read()
     if not data:
         raise Exception('No content from server')
