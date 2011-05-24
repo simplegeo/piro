@@ -85,15 +85,18 @@ def stop_simplegeo_cassandra(hosts, args=None, **kwargs):
 
 def wait_for_cassandra_response(host, keyspace, timeout):
     start = int(time.time())
+    timeout_time = start + timeout
     cassandra_alive = False
     host = util.hostname(host)
     while (not cassandra_alive):
-        if (int(time.time()) > (start + timeout)):
+        now = int(time.time())
+        if (now >= timeout_time):
             cassandra_alive = 'timeout'
             transport.close()
             continue
         try:
             socket = TSocket.TSocket(host, 9160)
+            socket.setTimeout(timeout * 1000)
             transport = TTransport.TFramedTransport(socket)
             protocol = TBinaryProtocolAccelerated(transport)
             client = Cassandra.Client(protocol)
@@ -126,7 +129,9 @@ def restart_simplegeo_cassandra(hosts, args=None, **kwargs):
                                                    args.timeout)
             util.print_status(('', ('keyspaces', response)))
             if 'system' not in response:
-                util.print_status(('', ('ERROR', 'Could not verify startup on %s' % host)))
+                util.print_status(('', ('ERROR', 'Could not verify '
+                                        'simplegeo-cassandra startup '
+                                        'on %s' % host.name)))
                 if args.prod:
                     print
                     print 'Cowardly refusing to continue production restart'
