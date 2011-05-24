@@ -12,9 +12,6 @@ import piro.util as util
 from piro.thrift.cassandra import Cassandra
 from piro.thrift.cassandra.ttypes import *
 
-# I need to make the generic call signature match the specific call
-# signature. Otherwise I'm going to unintentionally catch
-# AttributeErrors lower down the call stack.
 def start(hosts, service=None, **kwargs):
     try:
         service_fn = getattr(sys.modules['piro.service'],
