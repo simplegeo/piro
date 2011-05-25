@@ -1,3 +1,15 @@
+piro (0.1.9) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Add ability to enable/disable puppet.
+  * Relocate NoContentException. I'm not sure why I have to do this, but
+    it errors if I don't.
+  * Add enable/disable puppet functionality.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 25 May 2011 18:30:03 +0000
+
 piro (0.1.8) lucid; urgency=low
 
   [ Paul Lathrop ]
