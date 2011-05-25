@@ -3,6 +3,7 @@
 import sys
 import time
 
+from cassandra import Cassandra
 from thrift import Thrift
 from thrift.transport import TTransport
 from thrift.transport import TSocket
@@ -10,10 +11,6 @@ from thrift.protocol.TBinaryProtocol import TBinaryProtocolAccelerated
 
 from piro.service import monit
 import piro.util as util
-
-
-from cassandra import Cassandra
-from cassandra.ttypes import *
 
 def start(hosts, service=None, **kwargs):
     """
@@ -136,8 +133,10 @@ def stop_simplegeo_cassandra(hosts, args=None, **kwargs):
     if args.prod and len(azs) > 1:
         print 'cannot stop production cassandra in multiple AZs!'
         return
-    elif args.prod:
-        util.disable_az(azs[0])
+    elif args.prod and not util.disable_az(az, args):
+        print 'Could not disable AZ %s' % az
+        print 'Cowardly refusing to continue production restart'
+        return
     for host in hosts:
         util.set_cassandra_score(host)
         util.disable_puppet(util.hostname(host))
@@ -199,7 +198,7 @@ def restart_simplegeo_cassandra(hosts, args=None, **kwargs):
     """
     hosts = util.hosts_by_az(hosts)
     for az in hosts.keys():
-        if args.prod and not util.disable_az(az):
+        if args.prod and not util.disable_az(az, args):
             print 'Could not disable AZ %s' % az
             print 'Cowardly refusing to continue production restart'
             break
@@ -221,7 +220,7 @@ def restart_simplegeo_cassandra(hosts, args=None, **kwargs):
                     print
                     print 'Cowardly refusing to continue production restart'
                     break
-        if args.prod and not util.enable_az(az):
+        if args.prod and not util.enable_az(az, args):
             print 'Could not re-enable AZ %s' % az
             print 'Cowardly refusing to continue production restart'
             break

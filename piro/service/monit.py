@@ -7,12 +7,7 @@ from urllib import urlencode
 import urllib2 as url
 from xml.etree import ElementTree
 
-class NoContentException(Exception):
-    """
-    Exception class for when a call to the monit HTTP status enpoint
-    returns an empty response.
-    """
-    pass
+from piro.util import NoContentException
 
 def stop(service, host, wait=False):
     """
