@@ -96,7 +96,47 @@ def generic_status(hosts, service=None, **kwargs):
     for host in hosts:
         util.print_status((host, monit.status(service, util.hostname(host))))
 
+def enable(hosts, service=None, **kwargs):
+    """
+    Attempts to dispatch to a service-specific enable function. If one
+    cannot be found, print a message and exit.
+    """
+    try:
+        service_fn = getattr(sys.modules['piro.service'],
+                             'enable_%s' % service.lower().replace('-', '_'))
+    except AttributeError:
+        print 'No enable method defined for %s.' % service
+        return None
+    return service_fn(hosts, service=service, **kwargs)
+
+def disable(hosts, service=None, **kwargs):
+    """
+    Attempts to dispatch to a service-specific disable function. If one
+    cannot be found, print a message and exit.
+    """
+    try:
+        service_fn = getattr(sys.modules['piro.service'],
+                             'disable_%s' % service.lower().replace('-', '_'))
+    except AttributeError:
+        print 'No disable method defined for %s.' % service
+        return None
+    return service_fn(hosts, service=service, **kwargs)
+
 ### Put non-generic services here. ###
+def enable_puppet(hosts, *args, **kwargs):
+    """
+    Enable puppet on a group of hosts.
+    """
+    for host in hosts:
+        util.print_status((host, ('enable_puppet', util.enable_puppet(host))))
+
+def disable_puppet(hosts, *args, **kwargs):
+    """
+    Disable puppet on a group of hosts.
+    """
+    for host in hosts:
+        util.print_status((host, ('disable_puppet', util.disable_puppet(host))))
+
 def start_simplegeo_cassandra(hosts, args=None, **kwargs):
     """
     Service-specific start function for simplegeo-cassandra.

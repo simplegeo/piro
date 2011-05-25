@@ -7,7 +7,7 @@ from urllib import urlencode
 import urllib2 as url
 from xml.etree import ElementTree
 
-from piro.util import NoContentException
+from piro import NoContentException
 
 def stop(service, host, wait=False):
     """
