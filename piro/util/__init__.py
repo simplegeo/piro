@@ -2,11 +2,19 @@
 
 from collections import Sequence, Set
 import sys
+from time import sleep, time
 
 import piro.clustohttp as clusto
+from piro.util.amazinghorse import AmazingHorse
 
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
 
+class NoContentException(Exception):
+    """
+    Exception class for when a call to an HTTP endpoint returns an
+    empty response.
+    """
+    pass
 
 def get_contents(pool):
     """Given a clusto pool, return the set of entities that pool
@@ -43,17 +51,47 @@ def hostname(host):
     """
     return host.attr_value(key='ec2', subkey='public-dns')
 
-def disable_az(az):
+def get_piro_password():
     """
-    Given an AZ, disable that AZ in the ELB.
+    Fetch piro's password from clusto.
     """
-    pass
+    return 'piro'
 
-def enable_az(az):
+def disable_az(az, args):
     """
-    Given an AZ, enable that AZ in the ELB.
+    Given an AZ, disable that AZ in the ELB using amazinghorse.
     """
-    pass
+    client = AmazingHorse(username=args.username, password=args.password)
+    client.disable_availability_zone(az, 'API')
+    status = az in client.get_availability_zones('API')
+    start_time = int(time())
+    # ELB requests usually take 2 minutes or less, timeout after 3
+    timeout_time = start_time + 180
+    while status:
+        now = int(time())
+        if (now >= timeout_time):
+            break
+        sleep(.5)
+        status = az in client.get_availability_zones('API')
+    return not status
+
+def enable_az(az, args):
+    """
+    Given an AZ, enable that AZ in the ELB using amazinghorse.
+    """
+    client = AmazingHorse(username=args.username, password=args.password)
+    client.disable_availability_zone(az, 'API')
+    status = az not in client.get_availability_zones('API')
+    start_time = int(time())
+    # ELB requests usually take 2 minutes or less, timeout after 3
+    timeout_time = start_time + 180
+    while status:
+        now = int(time())
+        if (now >= timeout_time):
+            break
+        sleep(.5)
+        status = az not in client.get_availability_zones('API')
+    return not status
 
 def set_cassandra_score(host):
     """
