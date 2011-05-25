@@ -11,13 +11,6 @@ from piro.util.amazinghorse import AmazingHorse
 
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
 
-class NoContentException(Exception):
-    """
-    Exception class for when a call to an HTTP endpoint returns an
-    empty response.
-    """
-    pass
-
 def get_contents(pool):
     """Given a clusto pool, return the set of entities that pool
     contains."""

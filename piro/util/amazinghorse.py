@@ -5,7 +5,7 @@ try:
 except ImportError:
     import json
 import urllib2 as url
-from piro.util import NoContentException
+from piro import NoContentException
 
 class AmazingHorse(object):
     """
