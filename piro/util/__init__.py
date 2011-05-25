@@ -55,6 +55,7 @@ def get_piro_password():
     """
     Fetch piro's password from clusto.
     """
+    # Obviously this isn't fetched from clusto yet. It will be.
     return 'piro'
 
 def disable_az(az, args):
@@ -105,6 +106,18 @@ def clear_cassandra_score(host):
     """
     pass
 
+def disable_puppet(host):
+    """
+    Given a host, disable puppet on that host.
+    """
+    pass
+
+def enable_puppet(host):
+    """
+    Given a host, enable puppet on that host.
+    """
+    pass
+
 def _print_status(status):
     """
     Pretty-print status tuples.
@@ -130,15 +143,3 @@ def print_status(statuses):
     else:
         for status in statuses:
             _print_status(status)
-
-def disable_puppet(host):
-    """
-    Given a host, disable puppet on that host.
-    """
-    pass
-
-def enable_puppet(host):
-    """
-    Given a host, enable puppet on that host.
-    """
-    pass
