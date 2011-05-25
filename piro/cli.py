@@ -7,7 +7,7 @@ import piro.clustohttp as clusto
 import piro.service
 import piro.util as util
 
-ACTIONS = ['start', 'stop', 'restart', 'status']
+ACTIONS = ['start', 'stop', 'restart', 'status', 'enable', 'disable']
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
 
 
