@@ -17,12 +17,6 @@ handler.setFormatter(logging.Formatter('%(levelname)s %(message)s'))
 
 log = logging.getLogger('clustohttp')
 log.addHandler(handler)
-#log.setLevel(logging.DEBUG)
-
-try:
-    AUTH_BASIC = file('%s/.clustohttp' % os.environ['HOME'], 'r').read()
-except:
-    AUTH_BASIC = None
 
 def request(method, url, body='', headers={}):
     log.debug('%s %s' % (method, url))
@@ -30,9 +24,6 @@ def request(method, url, body='', headers={}):
     if type(body) != type(''):
         body = urlencode(body)
     url = urlsplit(url, 'http')
-
-    if AUTH_BASIC:
-        headers['Authorization'] = 'Basic %s' % AUTH_BASIC.encode('base64')
 
     conn = httplib.HTTPConnection(url.hostname, url.port)
     if url.query:
@@ -53,25 +44,35 @@ def request(method, url, body='', headers={}):
     return (response.status, response.getheaders(), data)
 
 class ClustoProxy(object):
-    def __init__(self, url):
+    headers = {}
+
+    def __init__(self, url, username=None, password=''):
         self.url = url
+        self.username = username
+        self.password = password
+        if self.username:
+            auth = '%s:%s' % (self.username, self.password)
+            self.headers['Authorization'] = 'Basic %s' % auth.encode('base64')
 
     def get_entities(self, **kwargs):
         for k, v in kwargs.items():
             kwargs[k] = json.dumps(v)
-        status, headers, response = request('POST', self.url + '/query/get_entities?%s' % urlencode(kwargs))
+        status, headers, response = request('POST', self.url + '/query/get_entities?%s' % urlencode(kwargs)
+                                            headers=self.headers)
         if status != 200:
             raise Exception(response)
         return [EntityProxy(self.url, x) for x in json.loads(response)]
 
     def get(self, name):
-        status, headers, response = request('GET', self.url + '/query/get?name=%s' % quote(name))
+        status, headers, response = request('GET', self.url + '/query/get?name=%s' % quote(name)
+                                            headers=self.headers)
         if status != 200:
             raise Exception(response)
         return [EntityProxy(self.url, x['object'], cache=x) for x in json.loads(response)]
 
     def get_by_name(self, name):
-        status, headers, response = request('GET', self.url + '/query/get_by_name?name=%s' % quote(name))
+        status, headers, response = request('GET', self.url + '/query/get_by_name?name=%s' % quote(name)
+                                            headers=self.headers)
         if status != 200:
             raise Exception(response)
         obj = json.loads(response)
@@ -81,25 +82,33 @@ class ClustoProxy(object):
         url = self.url + '/query/get_from_pools?pools=%s' % ','.join(pools)
         if clusto_types:
             url += '&types=' + ','.join(clusto_types)
-        status, headers, response = request('GET', url)
+        status, headers, response = request('GET', url, headers=self.headers)
         if status != 200:
             raise Exception(response)
         return [EntityProxy(self.url, x) for x in json.loads(response)]
 
     def get_ip_manager(self, ip):
-        status, headers, response = request('GET', self.url + '/query/get_ip_manager?ip=%s' % ip)
+        status, headers, response = request('GET', self.url + '/query/get_ip_manager?ip=%s' % ip,
+                                            headers=self.headers)
         if status != 200:
             raise Exception(response)
         return EntityProxy(self.url, json.loads(response))
 
 class EntityProxy(object):
-    def __init__(self, baseurl, path, cache={}):
+    headers = {}
+
+    def __init__(self, baseurl, path, cache={}, username=None, password=''):
         self.baseurl = baseurl
         self.path = path
         self.cache = cache
-
         self.url = baseurl + path
         self.name = self.path.rsplit('/', 1)[1]
+        self.username = username
+        self.password = password
+        if self.username:
+            auth = '%s:%s' % (self.username, self.password)
+            self.headers['Authorization'] = 'Basic %s' % auth.encode('base64')
+
 
     def __getattr__(self, action):
         def method(**kwargs):
@@ -111,9 +120,11 @@ class EntityProxy(object):
                     v = json.dumps(v)
                 data[k] = v
             if data:
-                status, headers, response = request('GET', '%s/%s?%s' % (self.url, action, urlencode(data)))
+                status, headers, response = request('GET', '%s/%s?%s' % (self.url, action, urlencode(data)),
+                                                    headers=self.headers)
             else:
-                status, headers, response = request('GET', '%s/%s' % (self.url, action))
+                status, headers, response = request('GET', '%s/%s' % (self.url, action),
+                                                    headers=self.headers)
             if status != 200:
                 raise Exception(response)
             if response:
