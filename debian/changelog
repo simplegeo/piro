@@ -1,3 +1,13 @@
+piro (0.1.23) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Add --duration argument to disable puppet for a certain length of
+    time.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 14 Jun 2011 20:00:20 +0000
+
 piro (0.1.22) lucid; urgency=low
 
   [ Paul Lathrop ]
