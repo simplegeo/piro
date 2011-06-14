@@ -137,6 +137,13 @@ def disable_puppet(hosts, *args, **kwargs):
     for host in hosts:
         util.print_status((host, ('disable_puppet', util.disable_puppet(host))))
 
+def status_puppet(hosts, *args, **kwargs):
+    """
+    Get the status of puppet on a group of hosts.
+    """
+    for host in hosts:
+        util.print_status((host, ('puppet', util.status_puppet(host))))
+
 def start_simplegeo_cassandra(hosts, args=None, **kwargs):
     """
     Service-specific start function for simplegeo-cassandra.

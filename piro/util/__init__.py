@@ -2,6 +2,10 @@
 
 from collections import Sequence, Set
 from functools import partial
+try:
+    import simplejson as json
+except ImportError:
+    import json
 from time import sleep, time
 import urllib2 as url
 
@@ -127,6 +131,19 @@ def disable_puppet(host):
         return True
     else:
         return False
+
+def status_puppet(host):
+    """
+    Given a host, disable puppet on that host.
+    """
+    req = url.Request(UTILITY_API + '/instance/%s.json' % host.name)
+    res = url.urlopen(req, timeout=1)
+    data = json.load(res)
+    try:
+        ttl = ", ttl=%s" % str(data['ttl'])
+    except KeyError:
+        ttl = ''
+    return "%s%s" % (data[host], ttl)
 
 def _print_status(status):
     """
