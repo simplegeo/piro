@@ -110,7 +110,7 @@ def enable_puppet(host):
     """
     req = url.Request(UTILITY_API + '/instance/%s.json?state=enabled' % host.name)
     res = url.urlopen(req, timeout=1)
-    data = res.read()
+    data = json.load(res)
     if not data:
         raise NoContentException('No content from server')
     if data == 1:
@@ -124,7 +124,7 @@ def disable_puppet(host):
     """
     req = url.Request(UTILITY_API + '/instance/%s.json?state=disabled' % host.name)
     res = url.urlopen(req, timeout=1)
-    data = res.read()
+    data = json.load(res)
     if not data:
         raise NoContentException('No content from server')
     if data == "OK":
