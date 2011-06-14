@@ -7,7 +7,7 @@ Build-Depends: cdbs,
  python,
  python-support,
  python-setuptools,
- python-cassandra,
+ python-simplegeo-penelope,
  python-thrift
 Standards-Version: 3.8.4
 Homepage: https://github.com/simplegeo/piro
@@ -19,7 +19,7 @@ Depends: ${shlibs:Depends},
  python,
  python-support,
  python-setuptools,
- python-cassandra,
+ python-simplegeo-penelope,
  python-thrift
 Description: Intelligently manage services.
  A command-line utility to help you intelligently start, stop,
