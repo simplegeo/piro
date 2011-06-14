@@ -116,11 +116,17 @@ def enable_puppet(host):
     else:
         return True
 
-def disable_puppet(host):
+def disable_puppet(host, args=None):
     """
     Given a host, disable puppet on that host.
     """
-    req = url.Request(UTILITY_API + '/instance/%s.json?state=disabled' % host.name)
+    name = host.name
+    if args and args.duration:
+        ttl = "&ttl=%s" % args.duration
+    else:
+        ttl = ""
+    target = UTILITY_API + '/instance/%s.json?state=disabled%s' % (name, ttl)
+    req = url.Request()
     res = url.urlopen(req, timeout=1)
     data = json.load(res)
     if data == "OK":

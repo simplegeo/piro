@@ -21,7 +21,12 @@ def main():
                         'describing the hosts on which you wish to '
                         'perform the service control action.')
     parser.add_argument('-t', '--timeout', default=120, type=int,
-                        help='Timeout (for services/actions that support it.)')
+                        help='Timeout, in seconds (for services/actions that '
+                        'support it.)')
+    parser.add_argument('--duration', default=0, type=int,
+                        help='Duration of action, in seconds (for actions that'
+                        'support it.) If set to 0, uses some approximation of '
+                        '"forever."')
     parser.add_argument('-u', '--username', default='piro',
                         help='amazinghorse/clusto username (used to enable/disable '
                         'AZs in the ELB.)')
