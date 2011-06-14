@@ -6,7 +6,7 @@ try:
     import simplejson as json
 except ImportError:
     import json
-from time import sleep, time
+from time import asctime, localtime, sleep, time
 import urllib2 as url
 
 import piro.clustohttp as clusto
@@ -140,7 +140,8 @@ def status_puppet(host):
     res = url.urlopen(req, timeout=1)
     data = json.load(res)
     try:
-        ttl = ", ttl=%s" % str(data['ttl'])
+        enable_time = asctime(localtime(int(time()) + int(data['ttl'])))
+        ttl = " until %s" % enable_time
     except KeyError:
         ttl = ''
     return "%s%s" % (data[host.name], ttl)
