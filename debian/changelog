@@ -1,3 +1,12 @@
+piro (0.1.16) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Forgot to import partial.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 14 Jun 2011 18:20:19 +0000
+
 piro (0.1.15) lucid; urgency=low
 
   [ Paul Lathrop ]
