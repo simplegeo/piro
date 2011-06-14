@@ -114,7 +114,7 @@ def enable_puppet(host):
     if data not in [0,1]:
         raise Exception('Unexpected response from server')
     else:
-        return Trues
+        return True
 
 def disable_puppet(host):
     """
