@@ -143,7 +143,7 @@ def status_puppet(host):
         ttl = ", ttl=%s" % str(data['ttl'])
     except KeyError:
         ttl = ''
-    return "%s%s" % (data[host], ttl)
+    return "%s%s" % (data[host.name], ttl)
 
 def _print_status(status):
     """
