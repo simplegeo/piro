@@ -28,11 +28,9 @@ def main():
                         'support it.) If set to 0, uses some approximation of '
                         '"forever."')
     parser.add_argument('-u', '--username', default='piro',
-                        help='amazinghorse/clusto username (used to enable/disable '
-                        'AZs in the ELB.)')
+                        help='amazinghorse/clusto username')
     parser.add_argument('-p', '--password', default=None,
-                        help='amazinghorse/clusto password (used to enable/disable '
-                        'AZs in the ELB.)')
+                        help='amazinghorse/clusto password')
     args = parser.parse_args()
     args.prod = 'production' in args.pool
     hosts = util.get_hosts(args.pool, args.username, args.password)
