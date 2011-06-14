@@ -1,3 +1,13 @@
+piro (0.1.11) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Update utility api url.
+  * Remove stale dependencies.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 14 Jun 2011 16:59:25 +0000
+
 piro (0.1.10) lucid; urgency=low
 
   [ Paul Lathrop ]
