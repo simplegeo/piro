@@ -1,3 +1,14 @@
+piro (0.1.13) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * Remove cruft.
+  * Make clustohttp more intelligent about HTTP auth.
+  * Refactor use of clustohttp to use new auth stuff.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 14 Jun 2011 17:54:20 +0000
+
 piro (0.1.12) lucid; urgency=low
 
   [ Paul Lathrop ]
