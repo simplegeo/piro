@@ -1,6 +1,7 @@
 """Utility functions for piro."""
 
 from collections import Sequence, Set
+from functools import partial
 from time import sleep, time
 import urllib2 as url
 
