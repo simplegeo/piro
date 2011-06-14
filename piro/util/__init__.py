@@ -45,13 +45,6 @@ def hostname(host):
     """
     return host.attr_value(key='ec2', subkey='public-dns')
 
-def get_piro_password():
-    """
-    Fetch piro's password from clusto.
-    """
-    # Obviously this isn't fetched from clusto yet. It will be.
-    return 'piro'
-
 def disable_az(az, args):
     """
     Given an AZ, disable that AZ in the ELB using amazinghorse.
