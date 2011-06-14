@@ -7,18 +7,24 @@ import urllib2 as url
 import piro.clustohttp as clusto
 from piro.util.amazinghorse import AmazingHorse
 
-CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
+CLUSTO_API  = 'http://clusto.simplegeo.com/api'
 UTILITY_API = 'https://utility-api.simplegeo.com:8443/0.1/puppet'
 
-def get_contents(pool):
+
+def get_contents(pool, username=None, password=''):
     """Given a clusto pool, return the set of entities that pool
     contains."""
-    return set(CLUSTO.get_by_name(pool).contents())
+    return set(clusto.ClustoProxy(CLUSTO_API,
+                                  username=username,
+                                  password=password).get_by_name(pool).contents())
 
-def get_hosts(pools):
+def get_hosts(pools, username=None, password=''):
     """Given an iterable containing clusto pools, return the set of
     entities contained by all of those pools."""
-    return set.intersection(*map(get_contents, pools))
+    return set.intersection(*map(partial(get_contents,
+                                         username=username,
+                                         password=password),
+                                 pools))
 
 def hosts_by_az(hosts):
     """

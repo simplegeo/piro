@@ -8,7 +8,6 @@ import piro.service
 import piro.util as util
 
 ACTIONS = ['start', 'stop', 'restart', 'status', 'enable', 'disable']
-CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
 
 
 def main():
@@ -24,15 +23,13 @@ def main():
     parser.add_argument('-t', '--timeout', default=120, type=int,
                         help='Timeout (for services/actions that support it.)')
     parser.add_argument('-u', '--username', default='piro',
-                        help='amazinghorse username (used to enable/disable '
+                        help='amazinghorse/clusto username (used to enable/disable '
                         'AZs in the ELB.)')
     parser.add_argument('-p', '--password', default=None,
-                        help='amazinghorse password (used to enable/disable '
+                        help='amazinghorse/clusto password (used to enable/disable '
                         'AZs in the ELB.)')
     args = parser.parse_args()
     args.prod = 'production' in args.pool
-    if args.password is None:
-        args.password = util.get_piro_password()
-    hosts = util.get_hosts(args.pool)
+    hosts = util.get_hosts(args.pool, args.username, args.password)
     return getattr(sys.modules['piro.service'],
                    args.action)(hosts, service=args.service, args=args)
