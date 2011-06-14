@@ -1,15 +1,14 @@
 """Utility functions for piro."""
 
 from collections import Sequence, Set
-import sys
 from time import sleep, time
-
-import paramiko as ssh
+import urllib2 as url
 
 import piro.clustohttp as clusto
 from piro.util.amazinghorse import AmazingHorse
 
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
+UTILITY_API = 'http://mgmt.simplegeo.com:8910/0.1/puppet'
 
 def get_contents(pool):
     """Given a clusto pool, return the set of entities that pool
@@ -101,44 +100,33 @@ def clear_cassandra_score(host):
     """
     pass
 
-def disable_puppet(host):
-    """
-    Given a host, disable puppet on that host.
-    """
-    user = pwd.getpwuid(os.getuid())[0]
-    client = ssh.SSHClient()
-    client.set_missing_host_key_policy(ssh.AutoAddPolicy)
-    try:
-        client.connect(host, username=user)
-        client.exec_command('sudo rm -f /etc/puppet/disable')
-        sin, sout, serr = client.exec_command('sudo tee /etc/puppet/disable')
-        sin.write('disabled by %s using piro\n' % user)
-        sin.flush()
-    except (ssh.BadHostKeyException,
-            ssh.AuthenticationException,
-            ssh.SSHException):
-        return False
-    finally:
-        client.close()
-    return True
-
 def enable_puppet(host):
     """
     Given a host, enable puppet on that host.
     """
-    user = pwd.getpwuid(os.getuid())[0]
-    client = ssh.SSHClient()
-    client.set_missing_host_key_policy(ssh.AutoAddPolicy)
-    try:
-        client.connect(host, username=user)
-        client.exec_command('sudo rm -f /etc/puppet/disable')
-    except (ssh.BadHostKeyException,
-            ssh.AuthenticationException,
-            ssh.SSHException):
+    req = url.Request(UTILITY_API + '/instance/%s.json?state=enabled' % host.name)
+    res = url.urlopen(req, timeout=1)
+    data = res.read()
+    if not data:
+        raise NoContentException('No content from server')
+    if data == 1:
+        return True
+    else:
         return False
-    finally:
-        client.close()
-    return True
+
+def disable_puppet(host):
+    """
+    Given a host, disable puppet on that host.
+    """
+    req = url.Request(UTILITY_API + '/instance/%s.json?state=enabled' % host.name)
+    res = url.urlopen(req, timeout=1)
+    data = res.read()
+    if not data:
+        raise NoContentException('No content from server')
+    if data == "OK":
+        return True
+    else:
+        return False
 
 def _print_status(status):
     """
