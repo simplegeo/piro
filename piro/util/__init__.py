@@ -8,7 +8,7 @@ import piro.clustohttp as clusto
 from piro.util.amazinghorse import AmazingHorse
 
 CLUSTO = clusto.ClustoProxy('http://clusto.simplegeo.com/api')
-UTILITY_API = 'http://mgmt.simplegeo.com:8910/0.1/puppet'
+UTILITY_API = 'https://utility-api.simplegeo.com:8443/0.1/puppet'
 
 def get_contents(pool):
     """Given a clusto pool, return the set of entities that pool
@@ -118,7 +118,7 @@ def disable_puppet(host):
     """
     Given a host, disable puppet on that host.
     """
-    req = url.Request(UTILITY_API + '/instance/%s.json?state=enabled' % host.name)
+    req = url.Request(UTILITY_API + '/instance/%s.json?state=disabled' % host.name)
     res = url.urlopen(req, timeout=1)
     data = res.read()
     if not data:
