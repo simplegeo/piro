@@ -1,3 +1,13 @@
+piro (0.1.12) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * the thrift bindings are actually in python-simplegeo-penelope
+    (Yuck!)
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 14 Jun 2011 17:12:18 +0000
+
 piro (0.1.11) lucid; urgency=low
 
   [ Paul Lathrop ]
