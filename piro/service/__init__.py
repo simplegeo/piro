@@ -128,14 +128,14 @@ def enable_puppet(hosts, *args, **kwargs):
     Enable puppet on a group of hosts.
     """
     for host in hosts:
-        util.print_status((host, ('enable_puppet', util.enable_puppet(host))))
+        util.print_status((host, ('enable puppet', util.enable_puppet(host))))
 
 def disable_puppet(hosts, *args, **kwargs):
     """
     Disable puppet on a group of hosts.
     """
     for host in hosts:
-        util.print_status((host, ('disable_puppet', util.disable_puppet(host))))
+        util.print_status((host, ('disable puppet', util.disable_puppet(host))))
 
 def status_puppet(hosts, *args, **kwargs):
     """
