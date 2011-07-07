@@ -1,3 +1,12 @@
+piro (1.0.4) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Clarify license.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 07 Jul 2011 20:08:59 +0000
+
 piro (1.0.3) maverick; urgency=low
 
   [ Paul Lathrop ]
