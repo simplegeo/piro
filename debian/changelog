@@ -1,3 +1,12 @@
+piro (1.0.6) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Fix sphinx formatting for license page.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 08 Jul 2011 19:15:58 +0000
+
 piro (1.0.5) maverick; urgency=low
 
   [ Paul Lathrop ]
