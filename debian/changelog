@@ -1,3 +1,16 @@
+piro (1.0.11) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Move username and password arguments out of the Service class. They
+    don't belong there.
+  * Support settung username/password in config file and/or environment.
+  * Add introspection capabilities to make piro easier to use.
+  * Add title to license.rst
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 09 Aug 2011 01:05:59 +0000
+
 piro (1.0.10) maverick; urgency=low
 
   * UNRELEASED
