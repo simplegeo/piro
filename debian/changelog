@@ -1,3 +1,12 @@
+piro (1.0.12) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Clarify CLI usage.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 09 Aug 2011 01:15:58 +0000
+
 piro (1.0.11) maverick; urgency=low
 
   [ Paul Lathrop ]
