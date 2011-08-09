@@ -29,11 +29,18 @@ class Monit(Service):
     Controls a service via the Monit web API.
     """
 
-    def _init_parser(self):
-        parser = Service._init_parser(self)
+    @classmethod
+    def _init_parser(cls):
+        parser = Service._init_parser()
         parser.add_argument('hosts', nargs='+',
                             help='Hosts on which you wish to control the '
-                            'service.')
+                            'monit service.')
+        parser.add_argument('-u', '--username', default='',
+                            help='Username to use when authenticating to the '
+                            'underlying service control mechanism.')
+        parser.add_argument('--password', default='',
+                            help='Password to use when authenticating to the '
+                            'underlying service control mechanism.')
         parser.add_argument('--port', type=int, default=2812,
                             help='Port where the Monit API is listening on '
                             'the given hosts')
