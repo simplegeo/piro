@@ -1,3 +1,12 @@
+piro (1.0.15) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Fix method declaration.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 16 Aug 2011 22:04:51 +0000
+
 piro (1.0.14) maverick; urgency=low
 
   [ Paul Lathrop ]
