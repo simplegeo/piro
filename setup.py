@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='piro',
-      version="1.0.15",
+      version="1.0.16",
       description='Piro is a tool for intelligently controlling services.',
       author='Paul Lathrop',
       author_email='paul@simplegeo.com',
